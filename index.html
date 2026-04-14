@@ -380,7 +380,7 @@
                                         {dashboardData.dailyStats.map((item, idx) => (
                                             <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
                                                 <div className="w-full max-w-[20px] bg-slate-100 rounded-t relative h-full flex items-end pt-5">
-                                                    <div className={`w-full rounded-t transition-all bg-blue-500`} style={{ height: `${item.safetyScore > 80 ? (item.safetyScore - 70) * 3.3 : item.safetyScore}%` }}></div>
+                                                    <div className={`w-full rounded-t transition-all ${item.safetyScore < 85 ? 'bg-red-500' : item.safetyScore < 90 ? 'bg-yellow-500' : 'bg-blue-500'}`} style={{ height: `${item.safetyScore > 80 ? (item.safetyScore - 70) * 3.3 : item.safetyScore}%` }}></div>
                                                     <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-white px-1 rounded shadow">{item.safetyScore}%</span>
                                                 </div>
                                                 <div className="mt-2 text-center"><span className="text-[10px] font-bold text-slate-600 block">{item.dayName}</span><span className="text-[9px] text-slate-400 block">{item.date.slice(0,5)}</span></div>
