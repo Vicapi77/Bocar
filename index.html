@@ -238,11 +238,23 @@
                     c_noimp_traf: acc.c_noimp_traf + (c.causeNoImpTraffic || 0), c_noimp_weath: acc.c_noimp_weath + (c.causeNoImpWeather || 0), c_noimp_closed: acc.c_noimp_closed + (c.causeNoImpClosed || 0), c_noimp_other: acc.c_noimp_other + (c.causeNoImpOther || 0),
                 }), { imp:0, noImp:0, lateStarts:0, accidents:0, slSum:0, rqSum:0, safetySum:0, c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0 });
 
+                // --- NUEVO: Cálculo de Nivel de Servicio Global ---
+                const sl = fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100;
+                const ss = fInc.length > 0 ? parseFloat((aggs.safetySum / fInc.length).toFixed(1)) : 100;
+                const rq = fInc.length > 0 ? parseFloat((aggs.rqSum / fInc.length).toFixed(1)) : 100;
+                
+                // Conversión: 100 menos la cantidad de incidencias (con un piso de 0)
+                const lsConv = Math.max(0, 100 - aggs.lateStarts);
+                const accConv = Math.max(0, 100 - aggs.accidents);
+                const impConv = Math.max(0, 100 - aggs.imp);
+                const compConv = Math.max(0, 100 - fCom.length);
+                
+                const globalServiceLevel = parseFloat(((sl + ss + rq + lsConv + accConv + impConv + compConv) / 7).toFixed(1));
+
                 return {
                     weekLabel: w.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, accidents: aggs.accidents, 
-                    serviceLevel: fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100,
-                    safetyScore: fInc.length > 0 ? parseFloat((aggs.safetySum / fInc.length).toFixed(1)) : 100,
-                    routeQuality: fInc.length > 0 ? parseFloat((aggs.rqSum / fInc.length).toFixed(1)) : 100,
+                    serviceLevel: sl, safetyScore: ss, routeQuality: rq, 
+                    globalServiceLevel, 
                     totalComplaints: fCom.length, incidents: fInc, complaints: fCom, dates: w.dates, aggs
                 };
             };
@@ -253,18 +265,42 @@
                 const prev = idx > 0 ? calculateWeekStats(keys[idx - 1]) : null;
                 const trends = keys.slice(Math.max(0, idx - 3), idx + 1).map(k => {
                     const s = calculateWeekStats(k);
-                    return { label: s ? s.weekLabel : k, serviceLevel: s ? s.serviceLevel : 0, lateStarts: s ? s.lateStarts : 0, imp: s ? s.totalImp : 0, accidents: s ? s.accidents : 0, complaints: s ? s.totalComplaints : 0, safetyScore: s ? s.safetyScore : 0, routeQuality: s ? s.routeQuality : 100 };
+                    return { 
+                        label: s ? s.weekLabel : k, serviceLevel: s ? s.serviceLevel : 0, 
+                        lateStarts: s ? s.lateStarts : 0, imp: s ? s.totalImp : 0, 
+                        accidents: s ? s.accidents : 0, complaints: s ? s.totalComplaints : 0, 
+                        safetyScore: s ? s.safetyScore : 0, routeQuality: s ? s.routeQuality : 100,
+                        globalServiceLevel: s ? s.globalServiceLevel : 0
+                    };
                 });
 
                 const dailyStats = current ? current.dates.map(d => {
                     const dayInc = current.incidents.filter(i => i.date === d);
+                    const dayCom = current.complaints.filter(c => c.date === d); 
                     const dt = new Date(d.split('/').reverse().join('-'));
+                    
+                    const imp = dayInc.reduce((s, i) => s + (i.imp || 0), 0);
+                    const noImp = dayInc.reduce((s, i) => s + (i.noImp || 0), 0);
+                    const lateStarts = dayInc.reduce((s, i) => s + (i.lateStarts || 0), 0);
+                    const accidents = dayInc.reduce((s, i) => s + (i.accidents || 0), 0);
+                    const routeQuality = dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + (i.routeQuality || 100), 0) / dayInc.length).toFixed(1)) : 100;
+                    const serviceLevel = dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + i.serviceLevel, 0) / dayInc.length).toFixed(1)) : 100;
+                    const safetyScore = dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + (i.safetyScore || 100), 0) / dayInc.length).toFixed(1)) : 100;
+                    const complaintsCount = dayCom.length;
+
+                    // --- NUEVO: Cálculo diario de Nivel de Servicio Global ---
+                    const gsl = parseFloat(((
+                        serviceLevel + safetyScore + routeQuality +
+                        Math.max(0, 100 - lateStarts) +
+                        Math.max(0, 100 - accidents) +
+                        Math.max(0, 100 - imp) +
+                        Math.max(0, 100 - complaintsCount)
+                    ) / 7).toFixed(1));
+
                     return { 
                         date: d, dayName: isNaN(dt) ? '-' : dt.toLocaleDateString('es-ES', { weekday: 'short' }).toUpperCase().replace('.',''),
-                        imp: dayInc.reduce((s, i) => s + (i.imp || 0), 0), noImp: dayInc.reduce((s, i) => s + (i.noImp || 0), 0), lateStarts: dayInc.reduce((s, i) => s + (i.lateStarts || 0), 0), accidents: dayInc.reduce((s, i) => s + (i.accidents || 0), 0), 
-                        routeQuality: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + (i.routeQuality || 100), 0) / dayInc.length).toFixed(1)) : 100,
-                        serviceLevel: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + i.serviceLevel, 0) / dayInc.length).toFixed(1)) : 100,
-                        safetyScore: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + (i.safetyScore || 100), 0) / dayInc.length).toFixed(1)) : 100
+                        imp, noImp, lateStarts, accidents, routeQuality, serviceLevel, safetyScore,
+                        globalServiceLevel: gsl
                     };
                 }) : [];
 
@@ -333,13 +369,14 @@
                     <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
                         {/* KPIs */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-                            <KpiCard title="Nivel Servicio" value={dashboardData.current.serviceLevel} prevValue={dashboardData.prev.serviceLevel} icon={Icons.Activity} colorClass="bg-emerald-500 text-emerald-600" higherIsBetter={true} suffix="%" />
+                            <KpiCard title="Nivel Serv. Global" value={dashboardData.current.globalServiceLevel} prevValue={dashboardData.prev.globalServiceLevel} icon={Icons.Activity} colorClass="bg-indigo-500 text-indigo-600" higherIsBetter={true} suffix="%" />
+                            <KpiCard title="Llegadas a Tiempo" value={dashboardData.current.serviceLevel} prevValue={dashboardData.prev.serviceLevel} icon={Icons.Activity} colorClass="bg-emerald-500 text-emerald-600" higherIsBetter={true} suffix="%" />
                             <KpiCard title="Score Seguridad" value={dashboardData.current.safetyScore} prevValue={dashboardData.prev.safetyScore} icon={Icons.Shield} colorClass="bg-blue-500 text-blue-600" higherIsBetter={true} suffix="%" />
+                            <KpiCard title="Apego a Croquis" value={dashboardData.current.routeQuality} prevValue={dashboardData.prev.routeQuality} icon={Icons.PieChart} colorClass="bg-cyan-500 text-cyan-600" higherIsBetter={true} suffix="%" />
                             <KpiCard title="Inicios Tarde" value={dashboardData.current.lateStarts} prevValue={dashboardData.prev.lateStarts} icon={Icons.Clock} colorClass="bg-amber-500 text-amber-600" />
-                            <KpiCard title="Calidad de Ruta" value={dashboardData.current.routeQuality} prevValue={dashboardData.prev.routeQuality} icon={Icons.PieChart} colorClass="bg-cyan-500 text-cyan-600" higherIsBetter={true} suffix="%" />
                             <KpiCard title="Fallas Imputables" value={dashboardData.current.totalImp || 0} prevValue={dashboardData.prev.totalImp} icon={Icons.BarChart2} colorClass="bg-rose-500 text-rose-600" />
                             <KpiCard title="Percances" value={dashboardData.current.accidents} prevValue={dashboardData.prev.accidents} icon={Icons.AlertOctagon} colorClass="bg-orange-500 text-orange-600" />
-                             <KpiCard title="Quejas" value={dashboardData.current.totalComplaints} prevValue={dashboardData.prev.totalComplaints} icon={Icons.MessageSquare} colorClass="bg-purple-500 text-purple-600" />
+                            <KpiCard title="Quejas" value={dashboardData.current.totalComplaints} prevValue={dashboardData.prev.totalComplaints} icon={Icons.MessageSquare} colorClass="bg-purple-500 text-purple-600" />
                         </div>
 
                         {/* GRÁFICAS PRINCIPALES */}
@@ -359,13 +396,29 @@
 
                         {/* GRÁFICAS DETALLE (DIARIO) */}
                         <div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                                 <div className="bg-white p-4 rounded-xl border shadow-sm">
-                                    <h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-emerald-500"><Icons.Activity /></span> Nivel Servicio (Diario)</h3>
+                                    <h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-indigo-500"><Icons.Activity /></span> N.S. Global (Diario)</h3>
                                     <div className="w-full flex items-end justify-between gap-2 h-[150px]">
                                         {dashboardData.dailyStats.map((item, idx) => (
                                             <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
                                                 <div className="w-full max-w-[20px] bg-slate-100 rounded-t relative h-full flex items-end pt-5">
+                                                    <div className="absolute w-full border-t-2 border-dashed border-red-400 z-10" style={{ bottom: '30%' }}><span className="absolute -top-3 -right-6 text-[8px] text-red-400 font-bold">90%</span></div>
+                                                    <div className={`w-full rounded-t transition-all ${item.globalServiceLevel >= 95 ? 'bg-indigo-500' : 'bg-indigo-300'}`} style={{ height: `${item.globalServiceLevel > 80 ? (item.globalServiceLevel - 70) * 3.3 : item.globalServiceLevel}%` }}></div>
+                                                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-white px-1 rounded shadow">{item.globalServiceLevel}%</span>
+                                                </div>
+                                                <div className="mt-2 text-center"><span className="text-[10px] font-bold text-slate-600 block">{item.dayName}</span><span className="text-[9px] text-slate-400 block">{item.date.slice(0,5)}</span></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="bg-white p-4 rounded-xl border shadow-sm">
+                                    <h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-emerald-500"><Icons.Activity /></span> Llegadas a Tiempo (Diario)</h3>
+                                    <div className="w-full flex items-end justify-between gap-2 h-[150px]">
+                                        {dashboardData.dailyStats.map((item, idx) => (
+                                            <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
+                                                <div className="w-full max-w-[20px] bg-slate-100 rounded-t relative h-full flex items-end pt-5">
+                                                    <div className="absolute w-full border-t-2 border-dashed border-red-400 z-10" style={{ bottom: '50%' }}><span className="absolute -top-3 -right-6 text-[8px] text-red-400 font-bold">90%</span></div>
                                                     <div className={`w-full rounded-t transition-all ${item.serviceLevel >= 98 ? 'bg-emerald-500' : 'bg-red-500'}`} style={{ height: `${item.serviceLevel > 90 ? (item.serviceLevel - 80) * 5 : item.serviceLevel}%` }}></div>
                                                     <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-white px-1 rounded shadow">{item.serviceLevel}%</span>
                                                 </div>
@@ -380,6 +433,7 @@
                                         {dashboardData.dailyStats.map((item, idx) => (
                                             <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
                                                 <div className="w-full max-w-[20px] bg-slate-100 rounded-t relative h-full flex items-end pt-5">
+                                                    <div className="absolute w-full border-t-2 border-dashed border-red-400 z-10" style={{ bottom: '30%' }}><span className="absolute -top-3 -right-6 text-[8px] text-red-400 font-bold">90%</span></div>
                                                     <div className={`w-full rounded-t transition-all ${item.safetyScore < 85 ? 'bg-red-500' : item.safetyScore < 90 ? 'bg-yellow-500' : 'bg-blue-500'}`} style={{ height: `${item.safetyScore > 80 ? (item.safetyScore - 70) * 3.3 : item.safetyScore}%` }}></div>
                                                     <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-white px-1 rounded shadow">{item.safetyScore}%</span>
                                                 </div>
@@ -392,7 +446,7 @@
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                                 <div className="bg-white p-4 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-amber-500"><Icons.Clock /></span> Inicios Tarde</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['lateStarts']} colors={['bg-amber-400']} height={150} /></div>
                                 <div className="bg-white p-4 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-orange-500"><Icons.AlertOctagon /></span> Percances</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['accidents']} colors={['bg-orange-400']} height={150} /></div>
-                                <div className="bg-white p-4 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-cyan-500"><Icons.PieChart /></span> Calidad de Ruta</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['routeQuality']} colors={['bg-cyan-400']} height={150} /></div>
+                                <div className="bg-white p-4 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-cyan-500"><Icons.PieChart /></span> Apego a Croquis</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['routeQuality']} colors={['bg-cyan-400']} height={150} /></div>
                             </div>
                         </div>
 
@@ -400,9 +454,10 @@
                         <div>
                             <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2"><span className="bg-slate-200 p-1 rounded"><Icons.BarChart2 /></span> Tendencias (Últimas 4 Semanas)</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <TrendChart title="Nivel Servicio" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" />
+                                <TrendChart title="N. Serv. Global" data={dashboardData.trends} dataKey="globalServiceLevel" color="#4f46e5" suffix="%" />
+                                <TrendChart title="Llegadas a Tiempo" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" />
                                 <TrendChart title="Score Seguridad" data={dashboardData.trends} dataKey="safetyScore" color="#3b82f6" suffix="%" />
-                                <TrendChart title="Calidad de Ruta" data={dashboardData.trends} dataKey="routeQuality" color="#06b6d4" suffix="%" />
+                                <TrendChart title="Apego a Croquis" data={dashboardData.trends} dataKey="routeQuality" color="#06b6d4" suffix="%" />
                                 <TrendChart title="Inicios Tarde" data={dashboardData.trends} dataKey="lateStarts" color="#f59e0b" />
                                 <TrendChart title="Fallas Imp." data={dashboardData.trends} dataKey="imp" color="#f43f5e" />
                                 <TrendChart title="Percances" data={dashboardData.trends} dataKey="accidents" color="#f97316" />
@@ -597,14 +652,14 @@
                             {tab === 'incident' ? (
                                 <>
                                     <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded border mb-2">
-                                         <div><label className="text-xs font-bold text-emerald-600">Nivel Servicio %</label><input type="number" step="0.1" name="serviceLevel" value={formData.serviceLevel} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-emerald-600"/></div>
+                                         <div><label className="text-xs font-bold text-emerald-600">Llegadas a Tiempo %</label><input type="number" step="0.1" name="serviceLevel" value={formData.serviceLevel} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-emerald-600"/></div>
                                          <div><label className="text-xs font-bold text-blue-600">Score Seguridad %</label><input type="number" step="0.1" name="safetyScore" value={formData.safetyScore} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-blue-600"/></div>
                                     </div>
                                     <div className="grid grid-cols-4 gap-2 bg-slate-50 p-3 rounded border">
                                         <div><label className="text-xs font-bold text-slate-500">Turno</label><select name="shift" value={formData.shift} onChange={handleChange} className="w-full border rounded p-1 text-sm"><option>T1</option><option>T2</option><option>T3</option><option>Mixto</option></select></div>
                                         <div><label className="text-xs font-bold text-slate-500">Inicios Tarde</label><input type="number" name="lateStarts" value={formData.lateStarts} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
                                         <div><label className="text-xs font-bold text-slate-500">Percances</label><input type="number" name="accidents" value={formData.accidents} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
-                                        <div><label className="text-xs font-bold text-slate-500">Calidad Ruta %</label><input type="number" step="0.1" name="routeQuality" value={formData.routeQuality} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-cyan-600"/></div>
+                                        <div><label className="text-xs font-bold text-slate-500">Apego Croquis %</label><input type="number" step="0.1" name="routeQuality" value={formData.routeQuality} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-cyan-600"/></div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4 mt-2">
                                         <div className="border-rose-100 border p-2 bg-rose-50/50 rounded"><h4 className="text-xs font-bold text-rose-600 mb-2">Imputables</h4><div className="space-y-2">
