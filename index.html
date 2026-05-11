@@ -120,7 +120,7 @@
         })();
 
         // --- CHART COMPONENTS ---
-        const TrendChart = ({ data, dataKey, color, title, suffix = '' }) => {
+        const TrendChart = ({ data, dataKey, color, title, suffix = '', weight = '' }) => {
             if (!data || data.length === 0) return null;
             const values = data.map(d => d[dataKey]); const min = Math.min(...values); const max = Math.max(...values);
             const paddingY = (max - min) * 0.2 || 1; const domainMin = Math.max(0, min - paddingY); const domainMax = max + paddingY; const range = domainMax - domainMin || 1;
@@ -129,7 +129,8 @@
             const dots = data.map((d, i) => ({ x: margin + (i / (data.length - 1)) * (width - 2 * margin), y: height - margin - ((d[dataKey] - domainMin) / range) * (height - 2 * margin), val: d[dataKey], label: d.label }));
             return (
                 <div className="flex flex-col items-center w-full bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <h5 className="text-sm font-bold text-slate-600 mb-3 uppercase tracking-wider">{title}</h5>
+                    <h5 className="text-sm font-bold text-slate-600 mb-1 uppercase tracking-wider">{title}</h5>
+                    {weight && <span className="text-[10px] text-slate-400 font-medium mb-2 bg-slate-100 px-2 py-0.5 rounded-full">Ponderación: {weight}</span>}
                     <div className="relative w-full flex justify-center">
                         <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
                             <polyline points={points} fill="none" stroke={color} strokeWidth="3" />
@@ -238,18 +239,28 @@
                     c_noimp_traf: acc.c_noimp_traf + (c.causeNoImpTraffic || 0), c_noimp_weath: acc.c_noimp_weath + (c.causeNoImpWeather || 0), c_noimp_closed: acc.c_noimp_closed + (c.causeNoImpClosed || 0), c_noimp_other: acc.c_noimp_other + (c.causeNoImpOther || 0),
                 }), { imp:0, noImp:0, lateStarts:0, accidents:0, slSum:0, rqSum:0, safetySum:0, c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0 });
 
-                // --- NUEVO: Cálculo de Nivel de Servicio Global ---
+                // --- Cálculo de Nivel de Servicio Global Ponderado ---
                 const sl = fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100;
                 const ss = fInc.length > 0 ? parseFloat((aggs.safetySum / fInc.length).toFixed(1)) : 100;
                 const rq = fInc.length > 0 ? parseFloat((aggs.rqSum / fInc.length).toFixed(1)) : 100;
                 
                 // Conversión: 100 menos la cantidad de incidencias (con un piso de 0)
-                const lsConv = Math.max(0, 100 - aggs.lateStarts);
-                const accConv = Math.max(0, 100 - aggs.accidents);
+                const lsConv  = Math.max(0, 100 - aggs.lateStarts);
                 const impConv = Math.max(0, 100 - aggs.imp);
                 const compConv = Math.max(0, 100 - fCom.length);
+                // Percances: cada percance resta 10 puntos sobre 100, piso en 0
+                const accConv = Math.max(0, 100 - aggs.accidents * 10);
                 
-                const globalServiceLevel = parseFloat(((sl + ss + rq + lsConv + accConv + impConv + compConv) / 7).toFixed(1));
+                // Ponderación: sl 20%, ss 20%, percances 20%, rq 10%, inicios 10%, imp 10%, quejas 10%
+                const globalServiceLevel = parseFloat((
+                    sl        * 0.20 +
+                    ss        * 0.20 +
+                    accConv   * 0.20 +
+                    rq        * 0.10 +
+                    lsConv    * 0.10 +
+                    impConv   * 0.10 +
+                    compConv  * 0.10
+                ).toFixed(1));
 
                 return {
                     weekLabel: w.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, accidents: aggs.accidents, 
@@ -455,13 +466,13 @@
                             <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2"><span className="bg-slate-200 p-1 rounded"><Icons.BarChart2 /></span> Tendencias (Últimas 4 Semanas)</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                 <TrendChart title="N. Serv. Global" data={dashboardData.trends} dataKey="globalServiceLevel" color="#4f46e5" suffix="%" />
-                                <TrendChart title="Llegadas a Tiempo" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" />
-                                <TrendChart title="Score Seguridad" data={dashboardData.trends} dataKey="safetyScore" color="#3b82f6" suffix="%" />
-                                <TrendChart title="Apego a Croquis" data={dashboardData.trends} dataKey="routeQuality" color="#06b6d4" suffix="%" />
-                                <TrendChart title="Inicios Tarde" data={dashboardData.trends} dataKey="lateStarts" color="#f59e0b" />
-                                <TrendChart title="Fallas Imp." data={dashboardData.trends} dataKey="imp" color="#f43f5e" />
-                                <TrendChart title="Percances" data={dashboardData.trends} dataKey="accidents" color="#f97316" />
-                                <TrendChart title="Quejas" data={dashboardData.trends} dataKey="complaints" color="#a855f7" />
+                                <TrendChart title="Llegadas a Tiempo" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" weight="20%" />
+                                <TrendChart title="Score Seguridad" data={dashboardData.trends} dataKey="safetyScore" color="#3b82f6" suffix="%" weight="20%" />
+                                <TrendChart title="Apego a Croquis" data={dashboardData.trends} dataKey="routeQuality" color="#06b6d4" suffix="%" weight="10%" />
+                                <TrendChart title="Inicios Tarde" data={dashboardData.trends} dataKey="lateStarts" color="#f59e0b" weight="10%" />
+                                <TrendChart title="Fallas Imp." data={dashboardData.trends} dataKey="imp" color="#f43f5e" weight="10%" />
+                                <TrendChart title="Percances" data={dashboardData.trends} dataKey="accidents" color="#f97316" weight="20%" />
+                                <TrendChart title="Quejas" data={dashboardData.trends} dataKey="complaints" color="#a855f7" weight="10%" />
                             </div>
                         </div>
 
