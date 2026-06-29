@@ -80,19 +80,19 @@
 
         // --- DATOS DEMO (ACTUALIZADOS A BOCAR) ---
         const DEMO_INCIDENTS = [
-            { date: '18/11/25', plant: 'Bocar', shift: 'T1', imp: 1, noImp: 0, lateStarts: 3, serviceLevel: 94.0, safetyScore: 92, routeQuality: 92.5, accidents: 1, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 }, 
-            { date: '25/11/25', plant: 'Bocar', shift: 'T1', imp: 0, noImp: 2, lateStarts: 1, serviceLevel: 97.5, safetyScore: 98, routeQuality: 96.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 2, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 }, 
-            { date: '01/12/25', plant: 'Bocar', shift: 'Mixto', imp: 2, noImp: 5, lateStarts: 2, serviceLevel: 98.0, safetyScore: 95, routeQuality: 98.0, accidents: 0, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 1, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 4, causeNoImpWeather: 0, causeNoImpClosed: 1, causeNoImpOther: 0 },
-            { date: '08/12/25', plant: 'Bocar', shift: 'T1', imp: 0, noImp: 13, lateStarts: 1, serviceLevel: 98.5, safetyScore: 99, routeQuality: 95.5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 10, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 3 },
-            { date: '09/12/25', plant: 'Bocar', shift: 'T1', imp: 0, noImp: 3, lateStarts: 0, serviceLevel: 99.2, safetyScore: 100, routeQuality: 99.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 3, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '09/12/25', plant: 'Bocar', shift: 'T2', imp: 0, noImp: 2, lateStarts: 2, serviceLevel: 97.8, safetyScore: 96, routeQuality: 94.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 1, causeNoImpWeather: 0, causeNoImpClosed: 1, causeNoImpOther: 0 },
-            { date: '10/12/25', plant: 'Bocar', shift: 'Mixto', imp: 0, noImp: 3, lateStarts: 0, serviceLevel: 99.5, safetyScore: 100, routeQuality: 100.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 1, causeNoImpWeather: 2, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '10/12/25', plant: 'Bocar', shift: 'T2', imp: 0, noImp: 1, lateStarts: 0, serviceLevel: 99.0, safetyScore: 98, routeQuality: 98.5, accidents: 1, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 1, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '11/12/25', plant: 'Bocar', shift: 'T1', imp: 3, noImp: 0, lateStarts: 1, serviceLevel: 96.5, safetyScore: 88, routeQuality: 89.0, accidents: 0, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 1, causeImpMech: 1, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '11/12/25', plant: 'Bocar', shift: 'T2', imp: 0, noImp: 4, lateStarts: 3, serviceLevel: 95.0, safetyScore: 94, routeQuality: 95.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 2, causeNoImpWeather: 0, causeNoImpClosed: 2, causeNoImpOther: 0 },
-            { date: '13/12/25', plant: 'Bocar', shift: 'T2', imp: 0, noImp: 13, lateStarts: 0, serviceLevel: 98.0, safetyScore: 97, routeQuality: 97.5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 10, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 3 },
-            { date: '08/12/25', plant: 'Bocar', shift: 'T1', imp: 0, noImp: 7, lateStarts: 0, serviceLevel: 99.0, safetyScore: 100, routeQuality: 99.5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 5, causeNoImpWeather: 2, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '08/12/25', plant: 'Bocar', shift: 'T2', imp: 6, noImp: 0, lateStarts: 1, serviceLevel: 92.5, safetyScore: 85, routeQuality: 88.0, accidents: 1, causeImpSleep: 4, causeImpAccident: 1, causeImpRoute: 1, causeImpMech: 0, causeImpLateStart: 0, causeImpOmission: 0, causeImpAccidentV: 0, causeImpBadDriving: 0, causeImpAttitude: 0, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '18/11/25', plant: 'Bocar', shift: 'T1', imp: 1, noImp: 0, lateStarts: 3, serviceLevel: 94.0, safetyScore: 92, routeQuality: 92.5, accidents: 1, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 }, 
+            { date: '25/11/25', plant: 'Bocar', shift: 'T1', imp: 0, noImp: 2, lateStarts: 1, serviceLevel: 97.5, safetyScore: 98, routeQuality: 96.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 2, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 }, 
+            { date: '01/12/25', plant: 'Bocar', shift: 'Mixto', imp: 2, noImp: 5, lateStarts: 2, serviceLevel: 98.0, safetyScore: 95, routeQuality: 98.0, accidents: 0, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 1, causeNoImpTraffic: 4, causeNoImpWeather: 0, causeNoImpClosed: 1, causeNoImpOther: 0 },
+            { date: '08/12/25', plant: 'Bocar', shift: 'T1', imp: 0, noImp: 13, lateStarts: 1, serviceLevel: 98.5, safetyScore: 99, routeQuality: 95.5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 10, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 3 },
+            { date: '09/12/25', plant: 'Bocar', shift: 'T1', imp: 0, noImp: 3, lateStarts: 0, serviceLevel: 99.2, safetyScore: 100, routeQuality: 99.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 3, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '09/12/25', plant: 'Bocar', shift: 'T2', imp: 0, noImp: 2, lateStarts: 2, serviceLevel: 97.8, safetyScore: 96, routeQuality: 94.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 0, causeNoImpClosed: 1, causeNoImpOther: 0 },
+            { date: '10/12/25', plant: 'Bocar', shift: 'Mixto', imp: 0, noImp: 3, lateStarts: 0, serviceLevel: 99.5, safetyScore: 100, routeQuality: 100.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 2, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '10/12/25', plant: 'Bocar', shift: 'T2', imp: 0, noImp: 1, lateStarts: 0, serviceLevel: 99.0, safetyScore: 98, routeQuality: 98.5, accidents: 1, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '11/12/25', plant: 'Bocar', shift: 'T1', imp: 3, noImp: 0, lateStarts: 1, serviceLevel: 96.5, safetyScore: 88, routeQuality: 89.0, accidents: 0, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 1, causeImpMech: 1, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '11/12/25', plant: 'Bocar', shift: 'T2', imp: 0, noImp: 4, lateStarts: 3, serviceLevel: 95.0, safetyScore: 94, routeQuality: 95.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 2, causeNoImpWeather: 0, causeNoImpClosed: 2, causeNoImpOther: 0 },
+            { date: '13/12/25', plant: 'Bocar', shift: 'T2', imp: 0, noImp: 13, lateStarts: 0, serviceLevel: 98.0, safetyScore: 97, routeQuality: 97.5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 10, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 3 },
+            { date: '08/12/25', plant: 'Bocar', shift: 'T1', imp: 0, noImp: 7, lateStarts: 0, serviceLevel: 99.0, safetyScore: 100, routeQuality: 99.5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 5, causeNoImpWeather: 2, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '08/12/25', plant: 'Bocar', shift: 'T2', imp: 6, noImp: 0, lateStarts: 1, serviceLevel: 92.5, safetyScore: 85, routeQuality: 88.0, accidents: 1, causeImpSleep: 4, causeImpAccident: 1, causeImpRoute: 1, causeImpMech: 0, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
         ];
         const DEMO_COMPLAINTS = [
             { date: '01/12/25', plant: 'Bocar', route: 'Ruta 1', issue: 'Retraso', detail: 'Llegó 15 mins tarde a la parada', action: 'Acta Admin', source: 'Laborales', type: 'Servicio' },
@@ -124,17 +124,26 @@
             if (!data || data.length === 0) return null;
             const values = data.map(d => d[dataKey]); const min = Math.min(...values); const max = Math.max(...values);
             const paddingY = (max - min) * 0.2 || 1; const domainMin = Math.max(0, min - paddingY); const domainMax = max + paddingY; const range = domainMax - domainMin || 1;
-            const width = 250; const height = 100; const margin = 15;
-            const points = data.map((d, i) => `${margin + (i / (data.length - 1)) * (width - 2 * margin)},${height - margin - ((d[dataKey] - domainMin) / range) * (height - 2 * margin)}`).join(" ");
-            const dots = data.map((d, i) => ({ x: margin + (i / (data.length - 1)) * (width - 2 * margin), y: height - margin - ((d[dataKey] - domainMin) / range) * (height - 2 * margin), val: d[dataKey], label: d.label }));
+            const n = data.length;
+            const colWidth = 80;
+            const width = Math.max(400, n * colWidth);
+            const height = 130; const marginX = 40; const marginY = 30;
+            const points = data.map((d, i) => `${marginX + (n > 1 ? (i / (n - 1)) : 0.5) * (width - 2 * marginX)},${height - marginY - ((d[dataKey] - domainMin) / range) * (height - 2 * marginY)}`).join(" ");
+            const dots = data.map((d, i) => ({ x: marginX + (n > 1 ? (i / (n - 1)) : 0.5) * (width - 2 * marginX), y: height - marginY - ((d[dataKey] - domainMin) / range) * (height - 2 * marginY), val: d[dataKey], label: d.label }));
             return (
                 <div className="flex flex-col items-center w-full bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                     <h5 className="text-sm font-bold text-slate-600 mb-1 uppercase tracking-wider">{title}</h5>
                     {weight && <span className="text-[10px] text-slate-400 font-medium mb-2 bg-slate-100 px-2 py-0.5 rounded-full">Ponderación: {weight}</span>}
-                    <div className="relative w-full flex justify-center">
-                        <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
+                    <div className="relative w-full" style={{ paddingBottom: '36px' }}>
+                        <svg width="100%" viewBox={`0 0 ${width} ${height + 22}`} preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
                             <polyline points={points} fill="none" stroke={color} strokeWidth="3" />
-                            {dots.map((dot, i) => (<g key={i}><circle cx={dot.x} cy={dot.y} r="4" fill="white" stroke={color} strokeWidth="2" /><text x={dot.x} y={dot.y - 12} textAnchor="middle" fontSize="11" fill="#475569" fontWeight="bold">{dot.val}{suffix}</text><text x={dot.x} y={height + 15} textAnchor="middle" fontSize="10" fill="#94a3b8">{dot.label}</text></g>))}
+                            {dots.map((dot, i) => (
+                                <g key={i}>
+                                    <circle cx={dot.x} cy={dot.y} r="5" fill="white" stroke={color} strokeWidth="2.5" />
+                                    <text x={dot.x} y={dot.y - 14} textAnchor="middle" fontSize="13" fill="#475569" fontWeight="bold">{dot.val}{suffix}</text>
+                                    <text x={dot.x} y={height + 20} textAnchor="middle" fontSize="11" fill="#94a3b8">{dot.label}</text>
+                                </g>
+                            ))}
                         </svg>
                     </div>
                 </div>
@@ -236,21 +245,21 @@
                     imp: acc.imp + (c.imp || 0), noImp: acc.noImp + (c.noImp || 0), lateStarts: acc.lateStarts + (c.lateStarts || 0), accidents: acc.accidents + (c.accidents || 0), slSum: acc.slSum + (c.serviceLevel || 0),
                     rqSum: acc.rqSum + (c.routeQuality || 0), safetySum: acc.safetySum + (c.safetyScore || 0),
                     c_imp_sleep: acc.c_imp_sleep + (c.causeImpSleep || 0), c_imp_acc: acc.c_imp_acc + (c.causeImpAccident || 0), c_imp_route: acc.c_imp_route + (c.causeImpRoute || 0), c_imp_mech: acc.c_imp_mech + (c.causeImpMech || 0),
-                    c_imp_latestart: acc.c_imp_latestart + (c.causeImpLateStart || 0), c_imp_omission: acc.c_imp_omission + (c.causeImpOmission || 0), c_imp_accidentv: acc.c_imp_accidentv + (c.causeImpAccidentV || 0), c_imp_baddriving: acc.c_imp_baddriving + (c.causeImpBadDriving || 0), c_imp_attitude: acc.c_imp_attitude + (c.causeImpAttitude || 0),
                     c_noimp_traf: acc.c_noimp_traf + (c.causeNoImpTraffic || 0), c_noimp_weath: acc.c_noimp_weath + (c.causeNoImpWeather || 0), c_noimp_closed: acc.c_noimp_closed + (c.causeNoImpClosed || 0), c_noimp_other: acc.c_noimp_other + (c.causeNoImpOther || 0),
-                }), { imp:0, noImp:0, lateStarts:0, accidents:0, slSum:0, rqSum:0, safetySum:0, c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_imp_latestart:0, c_imp_omission:0, c_imp_accidentv:0, c_imp_baddriving:0, c_imp_attitude:0, c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0 });
+                }), { imp:0, noImp:0, lateStarts:0, accidents:0, slSum:0, rqSum:0, safetySum:0, c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0 });
 
                 // --- Cálculo de Nivel de Servicio Global Ponderado ---
                 const sl = fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100;
                 const ss = fInc.length > 0 ? parseFloat((aggs.safetySum / fInc.length).toFixed(1)) : 100;
                 const rq = fInc.length > 0 ? parseFloat((aggs.rqSum / fInc.length).toFixed(1)) : 100;
-
-                // Conversión con nuevas fórmulas
+                
+                // Conversión: 100 menos la cantidad de incidencias (con un piso de 0)
                 const lsConv  = Math.max(0, 100 - aggs.lateStarts);
-                const accConv = Math.max(0, 100 - aggs.accidents * 50);   // cada percance resta 50
-                const impConv = Math.max(0, 100 - aggs.imp * 5);          // cada falla resta 5
-                const compConv = Math.max(0, 100 - fCom.length * 3);      // cada queja resta 3
-
+                const impConv = Math.max(0, 100 - aggs.imp);
+                const compConv = Math.max(0, 100 - fCom.length);
+                // Percances: cada percance resta 10 puntos sobre 100, piso en 0
+                const accConv = Math.max(0, 100 - aggs.accidents * 10);
+                
                 // Ponderación: sl 20%, ss 20%, percances 20%, rq 10%, inicios 10%, imp 10%, quejas 10%
                 const globalServiceLevel = parseFloat((
                     sl        * 0.20 +
@@ -274,7 +283,7 @@
                 const current = calculateWeekStats(selectedWeek);
                 const keys = Object.keys(WEEKS_DEF); const idx = keys.indexOf(selectedWeek);
                 const prev = idx > 0 ? calculateWeekStats(keys[idx - 1]) : null;
-                const trends = keys.slice(Math.max(0, idx - 3), idx + 1).map(k => {
+                const trends = keys.slice(Math.max(0, idx - 7), idx + 1).map(k => {
                     const s = calculateWeekStats(k);
                     return { 
                         label: s ? s.weekLabel : k, serviceLevel: s ? s.serviceLevel : 0, 
@@ -320,7 +329,7 @@
                 return {
                     current: current || {}, prev: prev || {}, trends, dailyStats, complaintReasons,
                     causes: {
-                        imp: [{ label: 'Op. Dormido', val: current?.aggs.c_imp_sleep || 0, color: '#f43f5e' }, { label: 'Siniestro', val: current?.aggs.c_imp_acc || 0, color: '#fb7185' }, { label: 'Desvío Ruta', val: current?.aggs.c_imp_route || 0, color: '#fda4af' }, { label: 'Falla Mec.', val: current?.aggs.c_imp_mech || 0, color: '#be123c' }, { label: 'Inicio Tarde', val: current?.aggs.c_imp_latestart || 0, color: '#e11d48' }, { label: 'Omisión Parada', val: current?.aggs.c_imp_omission || 0, color: '#9f1239' }, { label: 'Percance', val: current?.aggs.c_imp_accidentv || 0, color: '#881337' }, { label: 'Mal Manejo', val: current?.aggs.c_imp_baddriving || 0, color: '#ff6b6b' }, { label: 'Actitud', val: current?.aggs.c_imp_attitude || 0, color: '#c0392b' }],
+                        imp: [{ label: 'Op. Dormido', val: current?.aggs.c_imp_sleep || 0, color: '#f43f5e' }, { label: 'Siniestro', val: current?.aggs.c_imp_acc || 0, color: '#fb7185' }, { label: 'Desvío Ruta', val: current?.aggs.c_imp_route || 0, color: '#fda4af' }, { label: 'Falla Mec.', val: current?.aggs.c_imp_mech || 0, color: '#be123c' }],
                         noImp: [{ label: 'Tráfico', val: current?.aggs.c_noimp_traf || 0, color: '#64748b' }, { label: 'Calle Cerrada', val: current?.aggs.c_noimp_closed || 0, color: '#475569' }, { label: 'Clima', val: current?.aggs.c_noimp_weath || 0, color: '#94a3b8' }, { label: 'Otros', val: current?.aggs.c_noimp_other || 0, color: '#cbd5e1' }]
                     }
                 };
@@ -463,8 +472,8 @@
 
                         {/* TENDENCIAS */}
                         <div>
-                            <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2"><span className="bg-slate-200 p-1 rounded"><Icons.BarChart2 /></span> Tendencias (Últimas 4 Semanas)</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2"><span className="bg-slate-200 p-1 rounded"><Icons.BarChart2 /></span> Tendencias (Últimas 8 Semanas)</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <TrendChart title="N. Serv. Global" data={dashboardData.trends} dataKey="globalServiceLevel" color="#4f46e5" suffix="%" />
                                 <TrendChart title="Llegadas a Tiempo" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" weight="20%" />
                                 <TrendChart title="Score Seguridad" data={dashboardData.trends} dataKey="safetyScore" color="#3b82f6" suffix="%" weight="20%" />
@@ -562,7 +571,7 @@
                             initialTab={modalTab}
                             onSaveIncident={(data) => {
                                 const [y, m, d] = data.date.split('-');
-                                const imp = (parseInt(data.causeImpSleep)||0) + (parseInt(data.causeImpAccident)||0) + (parseInt(data.causeImpRoute)||0) + (parseInt(data.causeImpMech)||0) + (parseInt(data.causeImpLateStart)||0) + (parseInt(data.causeImpOmission)||0) + (parseInt(data.causeImpAccidentV)||0) + (parseInt(data.causeImpBadDriving)||0) + (parseInt(data.causeImpAttitude)||0);
+                                const imp = (parseInt(data.causeImpSleep)||0) + (parseInt(data.causeImpAccident)||0) + (parseInt(data.causeImpRoute)||0) + (parseInt(data.causeImpMech)||0);
                                 const noImp = (parseInt(data.causeNoImpTraffic)||0) + (parseInt(data.causeNoImpWeather)||0) + (parseInt(data.causeNoImpClosed)||0) + (parseInt(data.causeNoImpOther)||0);
                                 
                                 const payload = { 
@@ -574,7 +583,7 @@
                                     safetyScore: parseFloat(data.safetyScore)||100,
                                     routeQuality: parseFloat(data.routeQuality)||100,
                                     accidents: parseInt(data.accidents)||0,
-                                    causeImpSleep: parseInt(data.causeImpSleep)||0, causeImpAccident: parseInt(data.causeImpAccident)||0, causeImpRoute: parseInt(data.causeImpRoute)||0, causeImpMech: parseInt(data.causeImpMech)||0, causeImpLateStart: parseInt(data.causeImpLateStart)||0, causeImpOmission: parseInt(data.causeImpOmission)||0, causeImpAccidentV: parseInt(data.causeImpAccidentV)||0, causeImpBadDriving: parseInt(data.causeImpBadDriving)||0, causeImpAttitude: parseInt(data.causeImpAttitude)||0,
+                                    causeImpSleep: parseInt(data.causeImpSleep)||0, causeImpAccident: parseInt(data.causeImpAccident)||0, causeImpRoute: parseInt(data.causeImpRoute)||0, causeImpMech: parseInt(data.causeImpMech)||0,
                                     causeNoImpTraffic: parseInt(data.causeNoImpTraffic)||0, causeNoImpWeather: parseInt(data.causeNoImpWeather)||0, causeNoImpClosed: parseInt(data.causeNoImpClosed)||0, causeNoImpOther: parseInt(data.causeNoImpOther)||0
                                 };
 
@@ -635,7 +644,7 @@
                 routeQuality: initialData?.routeQuality || 100.0, 
                 lateStarts: initialData?.lateStarts || 0, 
                 accidents: initialData?.accidents || 0, 
-                causeImpSleep: initialData?.causeImpSleep || 0, causeImpAccident: initialData?.causeImpAccident || 0, causeImpRoute: initialData?.causeImpRoute || 0, causeImpMech: initialData?.causeImpMech || 0, causeImpLateStart: initialData?.causeImpLateStart || 0, causeImpOmission: initialData?.causeImpOmission || 0, causeImpAccidentV: initialData?.causeImpAccidentV || 0, causeImpBadDriving: initialData?.causeImpBadDriving || 0, causeImpAttitude: initialData?.causeImpAttitude || 0,
+                causeImpSleep: initialData?.causeImpSleep || 0, causeImpAccident: initialData?.causeImpAccident || 0, causeImpRoute: initialData?.causeImpRoute || 0, causeImpMech: initialData?.causeImpMech || 0, 
                 causeNoImpTraffic: initialData?.causeNoImpTraffic || 0, causeNoImpWeather: initialData?.causeNoImpWeather || 0, causeNoImpClosed: initialData?.causeNoImpClosed || 0, causeNoImpOther: initialData?.causeNoImpOther || 0, 
                 
                 // Campos de Queja
@@ -678,11 +687,6 @@
                                             <div className="flex justify-between items-center"><label className="text-xs">Siniestro</label><input type="number" name="causeImpAccident" value={formData.causeImpAccident} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
                                             <div className="flex justify-between items-center"><label className="text-xs">Desvío Ruta</label><input type="number" name="causeImpRoute" value={formData.causeImpRoute} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
                                             <div className="flex justify-between items-center"><label className="text-xs">Falla Mec.</label><input type="number" name="causeImpMech" value={formData.causeImpMech} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Inicio Tarde</label><input type="number" name="causeImpLateStart" value={formData.causeImpLateStart} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Omisión Parada</label><input type="number" name="causeImpOmission" value={formData.causeImpOmission} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Percance</label><input type="number" name="causeImpAccidentV" value={formData.causeImpAccidentV} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Mal Manejo</label><input type="number" name="causeImpBadDriving" value={formData.causeImpBadDriving} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Actitud</label><input type="number" name="causeImpAttitude" value={formData.causeImpAttitude} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
                                         </div></div>
                                         <div className="border-slate-200 border p-2 bg-slate-50 rounded"><h4 className="text-xs font-bold text-slate-500 mb-2">No Imputables</h4><div className="space-y-2">
                                             <div className="flex justify-between items-center"><label className="text-xs">Tráfico</label><input type="number" name="causeNoImpTraffic" value={formData.causeNoImpTraffic} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
