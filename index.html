@@ -120,22 +120,32 @@
         })();
 
         // --- CHART COMPONENTS ---
-        const TrendChart = ({ data, dataKey, color, title, suffix = '', weight = '' }) => {
+        const TrendChart = ({ data, dataKey, color, title, suffix = '', weight = '', goal = null, goalLabel = '' }) => {
             if (!data || data.length === 0) return null;
             const values = data.map(d => d[dataKey]); const min = Math.min(...values); const max = Math.max(...values);
-            const paddingY = (max - min) * 0.2 || 1; const domainMin = Math.max(0, min - paddingY); const domainMax = max + paddingY; const range = domainMax - domainMin || 1;
+            const allVals = goal !== null ? [...values, goal] : values;
+            const paddingY = (Math.max(...allVals) - Math.min(...allVals)) * 0.2 || 1;
+            const domainMin = Math.max(0, Math.min(...allVals) - paddingY); const domainMax = Math.max(...allVals) + paddingY; const range = domainMax - domainMin || 1;
             const n = data.length;
             const colWidth = 80;
             const width = Math.max(400, n * colWidth);
             const height = 130; const marginX = 40; const marginY = 30;
-            const points = data.map((d, i) => `${marginX + (n > 1 ? (i / (n - 1)) : 0.5) * (width - 2 * marginX)},${height - marginY - ((d[dataKey] - domainMin) / range) * (height - 2 * marginY)}`).join(" ");
-            const dots = data.map((d, i) => ({ x: marginX + (n > 1 ? (i / (n - 1)) : 0.5) * (width - 2 * marginX), y: height - marginY - ((d[dataKey] - domainMin) / range) * (height - 2 * marginY), val: d[dataKey], label: d.label }));
+            const toY = (v) => height - marginY - ((v - domainMin) / range) * (height - 2 * marginY);
+            const points = data.map((d, i) => `${marginX + (n > 1 ? (i / (n - 1)) : 0.5) * (width - 2 * marginX)},${toY(d[dataKey])}`).join(" ");
+            const dots = data.map((d, i) => ({ x: marginX + (n > 1 ? (i / (n - 1)) : 0.5) * (width - 2 * marginX), y: toY(d[dataKey]), val: d[dataKey], label: d.label }));
+            const goalY = goal !== null ? toY(goal) : null;
             return (
                 <div className="flex flex-col items-center w-full bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                     <h5 className="text-sm font-bold text-slate-600 mb-1 uppercase tracking-wider">{title}</h5>
                     {weight && <span className="text-[10px] text-slate-400 font-medium mb-2 bg-slate-100 px-2 py-0.5 rounded-full">Ponderación: {weight}</span>}
                     <div className="relative w-full" style={{ paddingBottom: '36px' }}>
                         <svg width="100%" viewBox={`0 0 ${width} ${height + 22}`} preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
+                            {goalY !== null && (
+                                <g>
+                                    <line x1={marginX} y1={goalY} x2={width - marginX} y2={goalY} stroke="#ef4444" strokeWidth="1.5" strokeDasharray="6,4" />
+                                    <text x={width - marginX + 4} y={goalY + 4} fontSize="11" fill="#ef4444" fontWeight="bold">{goalLabel || `Meta ${goal}${suffix}`}</text>
+                                </g>
+                            )}
                             <polyline points={points} fill="none" stroke={color} strokeWidth="3" />
                             {dots.map((dot, i) => (
                                 <g key={i}>
@@ -242,11 +252,12 @@
                 const fCom = complaints.filter(c => w.dates.includes(c.date) && (selectedPlant === 'Todas' || c.plant === selectedPlant));
                 
                 const aggs = fInc.reduce((acc, c) => ({
-                    imp: acc.imp + (c.imp || 0), noImp: acc.noImp + (c.noImp || 0), lateStarts: acc.lateStarts + (c.lateStarts || 0), accidents: acc.accidents + (c.accidents || 0), slSum: acc.slSum + (c.serviceLevel || 0),
+                    imp: acc.imp + Math.max(0, (c.imp || 0) - (c.causeImpMech || 0)), noImp: acc.noImp + (c.noImp || 0), lateStarts: acc.lateStarts + (c.lateStarts || 0), accidents: acc.accidents + (c.accidents || 0), slSum: acc.slSum + (c.serviceLevel || 0),
                     rqSum: acc.rqSum + (c.routeQuality || 0), safetySum: acc.safetySum + (c.safetyScore || 0),
+                    mechFaults: acc.mechFaults + (c.causeImpMech || 0),
                     c_imp_sleep: acc.c_imp_sleep + (c.causeImpSleep || 0), c_imp_acc: acc.c_imp_acc + (c.causeImpAccident || 0), c_imp_route: acc.c_imp_route + (c.causeImpRoute || 0), c_imp_mech: acc.c_imp_mech + (c.causeImpMech || 0),
                     c_noimp_traf: acc.c_noimp_traf + (c.causeNoImpTraffic || 0), c_noimp_weath: acc.c_noimp_weath + (c.causeNoImpWeather || 0), c_noimp_closed: acc.c_noimp_closed + (c.causeNoImpClosed || 0), c_noimp_other: acc.c_noimp_other + (c.causeNoImpOther || 0),
-                }), { imp:0, noImp:0, lateStarts:0, accidents:0, slSum:0, rqSum:0, safetySum:0, c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0 });
+                }), { imp:0, noImp:0, lateStarts:0, accidents:0, slSum:0, rqSum:0, safetySum:0, mechFaults:0, c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0 });
 
                 // --- Cálculo de Nivel de Servicio Global Ponderado ---
                 const sl = fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100;
@@ -272,7 +283,7 @@
                 ).toFixed(1));
 
                 return {
-                    weekLabel: w.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, accidents: aggs.accidents, 
+                    weekLabel: w.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, accidents: aggs.accidents, mechFaults: aggs.mechFaults,
                     serviceLevel: sl, safetyScore: ss, routeQuality: rq, 
                     globalServiceLevel, 
                     totalComplaints: fCom.length, incidents: fInc, complaints: fCom, dates: w.dates, aggs
@@ -290,7 +301,8 @@
                         lateStarts: s ? s.lateStarts : 0, imp: s ? s.totalImp : 0, 
                         accidents: s ? s.accidents : 0, complaints: s ? s.totalComplaints : 0, 
                         safetyScore: s ? s.safetyScore : 0, routeQuality: s ? s.routeQuality : 100,
-                        globalServiceLevel: s ? s.globalServiceLevel : 0
+                        globalServiceLevel: s ? s.globalServiceLevel : 0,
+                        mechFaults: s ? s.mechFaults : 0
                     };
                 });
 
@@ -329,7 +341,7 @@
                 return {
                     current: current || {}, prev: prev || {}, trends, dailyStats, complaintReasons,
                     causes: {
-                        imp: [{ label: 'Op. Dormido', val: current?.aggs.c_imp_sleep || 0, color: '#f43f5e' }, { label: 'Siniestro', val: current?.aggs.c_imp_acc || 0, color: '#fb7185' }, { label: 'Desvío Ruta', val: current?.aggs.c_imp_route || 0, color: '#fda4af' }, { label: 'Falla Mec.', val: current?.aggs.c_imp_mech || 0, color: '#be123c' }],
+                        imp: [{ label: 'Op. Dormido', val: current?.aggs.c_imp_sleep || 0, color: '#f43f5e' }, { label: 'Siniestro', val: current?.aggs.c_imp_acc || 0, color: '#fb7185' }, { label: 'Desvío Ruta', val: current?.aggs.c_imp_route || 0, color: '#fda4af' }],
                         noImp: [{ label: 'Tráfico', val: current?.aggs.c_noimp_traf || 0, color: '#64748b' }, { label: 'Calle Cerrada', val: current?.aggs.c_noimp_closed || 0, color: '#475569' }, { label: 'Clima', val: current?.aggs.c_noimp_weath || 0, color: '#94a3b8' }, { label: 'Otros', val: current?.aggs.c_noimp_other || 0, color: '#cbd5e1' }]
                     }
                 };
@@ -395,6 +407,7 @@
                             <KpiCard title="Apego a Croquis" value={dashboardData.current.routeQuality} prevValue={dashboardData.prev.routeQuality} icon={Icons.PieChart} colorClass="bg-cyan-500 text-cyan-600" higherIsBetter={true} suffix="%" />
                             <KpiCard title="Inicios Tarde" value={dashboardData.current.lateStarts} prevValue={dashboardData.prev.lateStarts} icon={Icons.Clock} colorClass="bg-amber-500 text-amber-600" />
                             <KpiCard title="Fallas Imputables" value={dashboardData.current.totalImp || 0} prevValue={dashboardData.prev.totalImp} icon={Icons.BarChart2} colorClass="bg-rose-500 text-rose-600" />
+                            <KpiCard title="Fallas Mecánicas" value={dashboardData.current.mechFaults || 0} prevValue={dashboardData.prev.mechFaults} icon={Icons.AlertOctagon} colorClass="bg-yellow-500 text-yellow-600" />
                             <KpiCard title="Percances" value={dashboardData.current.accidents} prevValue={dashboardData.prev.accidents} icon={Icons.AlertOctagon} colorClass="bg-orange-500 text-orange-600" />
                             <KpiCard title="Quejas" value={dashboardData.current.totalComplaints} prevValue={dashboardData.prev.totalComplaints} icon={Icons.MessageSquare} colorClass="bg-purple-500 text-purple-600" />
                         </div>
@@ -474,14 +487,15 @@
                         <div>
                             <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2"><span className="bg-slate-200 p-1 rounded"><Icons.BarChart2 /></span> Tendencias (Últimas 8 Semanas)</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <TrendChart title="N. Serv. Global" data={dashboardData.trends} dataKey="globalServiceLevel" color="#4f46e5" suffix="%" />
-                                <TrendChart title="Llegadas a Tiempo" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" weight="20%" />
-                                <TrendChart title="Score Seguridad" data={dashboardData.trends} dataKey="safetyScore" color="#3b82f6" suffix="%" weight="20%" />
-                                <TrendChart title="Apego a Croquis" data={dashboardData.trends} dataKey="routeQuality" color="#06b6d4" suffix="%" weight="10%" />
-                                <TrendChart title="Inicios Tarde" data={dashboardData.trends} dataKey="lateStarts" color="#f59e0b" weight="10%" />
-                                <TrendChart title="Fallas Imp." data={dashboardData.trends} dataKey="imp" color="#f43f5e" weight="10%" />
-                                <TrendChart title="Percances" data={dashboardData.trends} dataKey="accidents" color="#f97316" weight="20%" />
-                                <TrendChart title="Quejas" data={dashboardData.trends} dataKey="complaints" color="#a855f7" weight="10%" />
+                                <TrendChart title="N. Serv. Global" data={dashboardData.trends} dataKey="globalServiceLevel" color="#4f46e5" suffix="%" goal={95} />
+                                <TrendChart title="Llegadas a Tiempo" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" weight="20%" goal={98} />
+                                <TrendChart title="Score Seguridad" data={dashboardData.trends} dataKey="safetyScore" color="#3b82f6" suffix="%" weight="20%" goal={90} />
+                                <TrendChart title="Apego a Croquis" data={dashboardData.trends} dataKey="routeQuality" color="#06b6d4" suffix="%" weight="10%" goal={95} />
+                                <TrendChart title="Inicios Tarde" data={dashboardData.trends} dataKey="lateStarts" color="#f59e0b" weight="10%" goal={0} goalLabel="Meta: 0" />
+                                <TrendChart title="Fallas Imp." data={dashboardData.trends} dataKey="imp" color="#f43f5e" weight="10%" goal={0} goalLabel="Meta: 0" />
+                                <TrendChart title="Fallas Mecánicas" data={dashboardData.trends} dataKey="mechFaults" color="#eab308" goal={0} goalLabel="Meta: 0" />
+                                <TrendChart title="Percances" data={dashboardData.trends} dataKey="accidents" color="#f97316" weight="20%" goal={0} goalLabel="Meta: 0" />
+                                <TrendChart title="Quejas" data={dashboardData.trends} dataKey="complaints" color="#a855f7" weight="10%" goal={0} goalLabel="Meta: 0" />
                             </div>
                         </div>
 
@@ -686,7 +700,6 @@
                                             <div className="flex justify-between items-center"><label className="text-xs">Op. Dormido</label><input type="number" name="causeImpSleep" value={formData.causeImpSleep} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
                                             <div className="flex justify-between items-center"><label className="text-xs">Siniestro</label><input type="number" name="causeImpAccident" value={formData.causeImpAccident} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
                                             <div className="flex justify-between items-center"><label className="text-xs">Desvío Ruta</label><input type="number" name="causeImpRoute" value={formData.causeImpRoute} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Falla Mec.</label><input type="number" name="causeImpMech" value={formData.causeImpMech} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
                                         </div></div>
                                         <div className="border-slate-200 border p-2 bg-slate-50 rounded"><h4 className="text-xs font-bold text-slate-500 mb-2">No Imputables</h4><div className="space-y-2">
                                             <div className="flex justify-between items-center"><label className="text-xs">Tráfico</label><input type="number" name="causeNoImpTraffic" value={formData.causeNoImpTraffic} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
@@ -694,6 +707,9 @@
                                             <div className="flex justify-between items-center"><label className="text-xs">Clima</label><input type="number" name="causeNoImpWeather" value={formData.causeNoImpWeather} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
                                             <div className="flex justify-between items-center"><label className="text-xs">Otros</label><input type="number" name="causeNoImpOther" value={formData.causeNoImpOther} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
                                         </div></div>
+                                        <div className="border-yellow-200 border p-2 bg-yellow-50/50 rounded col-span-2"><h4 className="text-xs font-bold text-yellow-600 mb-2">Fallas Mecánicas</h4>
+                                            <div className="flex justify-between items-center"><label className="text-xs">Falla Mecánica de Unidad</label><input type="number" name="causeImpMech" value={formData.causeImpMech} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                        </div>
                                     </div>
                                 </>
                             ) : (
