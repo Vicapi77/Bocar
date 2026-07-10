@@ -265,20 +265,24 @@
                 const rq = fInc.length > 0 ? parseFloat((aggs.rqSum / fInc.length).toFixed(1)) : 100;
                 
                 // Conversión: 100 menos la cantidad de incidencias (con un piso de 0)
-                const lsConv  = Math.max(0, 100 - aggs.lateStarts);
-                const impConv = Math.max(0, 100 - aggs.imp);
+                const lsConv   = Math.max(0, 100 - aggs.lateStarts);
+                const impConv  = Math.max(0, 100 - aggs.imp);
                 const compConv = Math.max(0, 100 - fCom.length);
-                // Percances: cada percance resta 10 puntos sobre 100, piso en 0
-                const accConv = Math.max(0, 100 - aggs.accidents * 10);
+                // Percances: un solo percance en la semana = 0 puntos (penalización total)
+                const accConv  = aggs.accidents > 0 ? 0 : 100;
+                // Fallas Mecánicas: cada falla resta 100 puntos-día; se acumula por días con registro
+                // Lógica: 1 falla mecánica al día quita el porcentaje de ese día → conv = max(0, 100 - mechFaults)
+                const mechConv = Math.max(0, 100 - aggs.mechFaults);
                 
-                // Ponderación: sl 20%, ss 20%, percances 20%, rq 10%, inicios 10%, imp 10%, quejas 10%
+                // Ponderación: sl 15%, ss 15%, percances 20%, rq 10%, inicios 10%, imp 10%, mec 10%, quejas 10%
                 const globalServiceLevel = parseFloat((
-                    sl        * 0.20 +
-                    ss        * 0.20 +
+                    sl        * 0.15 +
+                    ss        * 0.15 +
                     accConv   * 0.20 +
                     rq        * 0.10 +
                     lsConv    * 0.10 +
                     impConv   * 0.10 +
+                    mechConv  * 0.10 +
                     compConv  * 0.10
                 ).toFixed(1));
 
@@ -491,11 +495,11 @@
                                 <TrendChart title="Llegadas a Tiempo" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" weight="20%" goal={98} />
                                 <TrendChart title="Score Seguridad" data={dashboardData.trends} dataKey="safetyScore" color="#3b82f6" suffix="%" weight="20%" goal={90} />
                                 <TrendChart title="Apego a Croquis" data={dashboardData.trends} dataKey="routeQuality" color="#06b6d4" suffix="%" weight="10%" goal={95} />
-                                <TrendChart title="Inicios Tarde" data={dashboardData.trends} dataKey="lateStarts" color="#f59e0b" weight="10%" goal={0} goalLabel="Meta: 0" />
-                                <TrendChart title="Fallas Imp." data={dashboardData.trends} dataKey="imp" color="#f43f5e" weight="10%" goal={0} goalLabel="Meta: 0" />
-                                <TrendChart title="Fallas Mecánicas" data={dashboardData.trends} dataKey="mechFaults" color="#eab308" goal={0} goalLabel="Meta: 0" />
+                                <TrendChart title="Inicios Tarde" data={dashboardData.trends} dataKey="lateStarts" color="#f59e0b" weight="10%" goal={2} goalLabel="Meta: 2" />
+                                <TrendChart title="Fallas Imp." data={dashboardData.trends} dataKey="imp" color="#f43f5e" weight="10%" goal={3} goalLabel="Meta: 3" />
+                                <TrendChart title="Fallas Mecánicas" data={dashboardData.trends} dataKey="mechFaults" color="#eab308" goal={1} goalLabel="Meta: 1" />
                                 <TrendChart title="Percances" data={dashboardData.trends} dataKey="accidents" color="#f97316" weight="20%" goal={0} goalLabel="Meta: 0" />
-                                <TrendChart title="Quejas" data={dashboardData.trends} dataKey="complaints" color="#a855f7" weight="10%" goal={0} goalLabel="Meta: 0" />
+                                <TrendChart title="Quejas" data={dashboardData.trends} dataKey="complaints" color="#a855f7" weight="10%" goal={6} goalLabel="Meta: 6" />
                             </div>
                         </div>
 
