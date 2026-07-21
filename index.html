@@ -291,20 +291,20 @@
                 
                 // Penalización binaria: si superas la meta semanal = 0 pts, si estás en meta o debajo = 100 pts
                 // Metas: inicios ≤ 2, imp ≤ 3, mec ≤ 1, quejas ≤ 6, percances = 0, sl ≥ 95%, ss ≥ 90%
-                const lsConv   = aggs.lateStarts > 2  ? 0 : 100;
-                const impConv  = aggs.imp        > 3  ? 0 : 100;
-                const mechConv = aggs.mechFaults  > 1  ? 0 : 100;
-                const compConv = fCom.length      > 6  ? 0 : 100;
-                const accConv  = aggs.accidents   > 0  ? 0 : 100;
-                const slConv   = sl < 95 ? 0 : 100;
-                const ssConv   = ss < 90 ? 0 : 100;
+                const lsConv   = aggs.lateStarts >= 2  ? 0 : 100;
+                const impConv  = aggs.imp         >= 3  ? 0 : 100;
+                const mechConv = aggs.mechFaults  >= 1  ? 0 : 100;
+                const compConv = fCom.length      >= 6  ? 0 : 100;
+                const accConv  = aggs.accidents   >= 1  ? 0 : 100;
+                const slConv   = sl <= 95 ? 0 : 100;
+                const ssConv   = ss <= 90 ? 0 : 100;
                 
                 // Ponderación: sl 15%, ss 15%, percances 20%, rq 10%, inicios 10%, imp 10%, mec 10%, quejas 10%
                 const globalServiceLevel = parseFloat((
                     slConv    * 0.15 +
                     ssConv    * 0.15 +
                     accConv   * 0.20 +
-                    (rq < 95 ? 0 : 100) * 0.10 +
+                    (rq <= 95 ? 0 : 100) * 0.10 +
                     lsConv    * 0.10 +
                     impConv   * 0.10 +
                     mechConv  * 0.10 +
@@ -333,16 +333,16 @@
                 const sl = fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100;
                 const ss = fInc.length > 0 ? parseFloat((aggs.safetySum / fInc.length).toFixed(1)) : 100;
                 const rq = fInc.length > 0 ? parseFloat((aggs.rqSum / fInc.length).toFixed(1)) : 100;
-                const lsConv   = aggs.lateStarts > 2  ? 0 : 100;
-                const impConv  = aggs.imp        > 3  ? 0 : 100;
-                const mechConv = aggs.mechFaults  > 1  ? 0 : 100;
-                const compConv = fCom.length      > 6  ? 0 : 100;
-                const accConv  = aggs.accidents   > 0  ? 0 : 100;
-                const slConv   = sl < 95 ? 0 : 100;
-                const ssConv   = ss < 90 ? 0 : 100;
+                const lsConv   = aggs.lateStarts >= 2  ? 0 : 100;
+                const impConv  = aggs.imp         >= 3  ? 0 : 100;
+                const mechConv = aggs.mechFaults  >= 1  ? 0 : 100;
+                const compConv = fCom.length      >= 6  ? 0 : 100;
+                const accConv  = aggs.accidents   >= 1  ? 0 : 100;
+                const slConv   = sl <= 95 ? 0 : 100;
+                const ssConv   = ss <= 90 ? 0 : 100;
                 const globalServiceLevel = parseFloat((
                     slConv * 0.15 + ssConv * 0.15 + accConv * 0.20 +
-                    (rq < 95 ? 0 : 100) * 0.10 + lsConv * 0.10 + impConv * 0.10 + mechConv * 0.10 + compConv * 0.10
+                    (rq <= 95 ? 0 : 100) * 0.10 + lsConv * 0.10 + impConv * 0.10 + mechConv * 0.10 + compConv * 0.10
                 ).toFixed(1));
                 // Semanas del mes para barras
                 const weeklyStats = (mo.weekKeys || []).map(wk => {
@@ -595,7 +595,7 @@
                                 <TrendChart title="Inicios Tarde" data={dashboardData.trends} dataKey="lateStarts" color="#f59e0b" weight="10%" goalFn={d => 2 * (d.weeksInMonth || 1)} goalLabel="" />
                                 <TrendChart title="Fallas Imp." data={dashboardData.trends} dataKey="imp" color="#f43f5e" weight="10%" goalFn={d => 3 * (d.weeksInMonth || 1)} goalLabel="" />
                                 <TrendChart title="Fallas Mecánicas" data={dashboardData.trends} dataKey="mechFaults" color="#eab308" weight="10%" goalFn={d => 1 * (d.weeksInMonth || 1)} goalLabel="" />
-                                <TrendChart title="Percances" data={dashboardData.trends} dataKey="accidents" color="#f97316" weight="20%" goal={0} goalLabel="Meta: 0" />
+                                <TrendChart title="Percances" data={dashboardData.trends} dataKey="accidents" color="#f97316" weight="20%" goal={1} goalLabel="Meta: 1" />
                                 <TrendChart title="Quejas" data={dashboardData.trends} dataKey="complaints" color="#a855f7" weight="10%" goalFn={d => 6 * (d.weeksInMonth || 1)} goalLabel="" />
                             </div>
                         </div>
