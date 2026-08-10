@@ -5,46 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Transporte - Bocar</title>
     
-    <script>
-        // --- DETECCIÓN DE FALLAS DE CARGA (CDN bloqueado, firewall, antivirus, etc.) ---
-        window.__scriptLoadErrors = [];
-        function __reportScriptError(nombre) {
-            window.__scriptLoadErrors.push(nombre);
-            __renderLoadError();
-        }
-        function __renderLoadError() {
-            var root = document.getElementById('root');
-            if (!root || !window.__scriptLoadErrors.length) return;
-            var loader = document.getElementById('initial-loader');
-            if (!loader) return; // React ya montó, no pisar el dashboard
-            root.innerHTML = '<div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#64748b;text-align:center;padding:20px;font-family:system-ui,-apple-system,sans-serif;">' +
-                '<div style="font-size:16px;font-weight:600;color:#e11d48;margin-bottom:8px;">No se pudo cargar el dashboard</div>' +
-                '<div style="font-size:13px;max-width:380px;">No se pudo descargar: <b>' + window.__scriptLoadErrors.join(', ') + '</b>.<br>Revisa tu conexión, antivirus/firewall o bloqueador de anuncios, y recarga la página. Si el problema sigue, prueba con otra red o navegador.</div>' +
-                '</div>';
-        }
-        document.addEventListener('DOMContentLoaded', __renderLoadError);
-        window.addEventListener('load', function () {
-            setTimeout(function () {
-                var root = document.getElementById('root');
-                var loader = document.getElementById('initial-loader');
-                if (root && loader) {
-                    root.innerHTML = '<div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#64748b;text-align:center;padding:20px;font-family:system-ui,-apple-system,sans-serif;">' +
-                        '<div style="font-size:16px;font-weight:600;color:#e11d48;margin-bottom:8px;">El dashboard tardó demasiado en cargar</div>' +
-                        '<div style="font-size:13px;max-width:380px;">Puede ser tu conexión, antivirus/firewall, o un bloqueador de anuncios impidiendo la conexión. Intenta con otra red o navegador y recarga la página.</div>' +
-                        '</div>';
-                }
-            }, 12000);
-        });
-    </script>
-
-    <script src="https://cdn.tailwindcss.com" onerror="__reportScriptError('Tailwind')"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js" onerror="__reportScriptError('React')"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" onerror="__reportScriptError('React-DOM')"></script>
-    <script src="https://unpkg.com/@babel/standalone@7.29.7/babel.min.js" onerror="__reportScriptError('Babel')"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.29.7/babel.min.js"></script>
     
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" onerror="__reportScriptError('Firebase App')"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" onerror="__reportScriptError('Firebase Firestore')"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js" onerror="__reportScriptError('Firebase Analytics')"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 
     <style>
         body { background-color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
@@ -60,7 +28,7 @@
 </head>
 <body>
     <div id="root">
-        <div id="initial-loader" style="height: 100vh; display: flex; align-items: center; justify-content: center; color: #64748b;">
+        <div style="height: 100vh; display: flex; align-items: center; justify-content: center; color: #64748b;">
             Cargando Dashboard...
         </div>
     </div>
@@ -269,7 +237,6 @@
             const [incidents, setIncidents] = useState([]);
             const [complaints, setComplaints] = useState([]);
             const [isLoading, setIsLoading] = useState(true);
-            const [loadError, setLoadError] = useState(null);
             const [selectedWeek, setSelectedWeek] = useState('S50-25');
             const [selectedPlant, setSelectedPlant] = useState('Todas');
             const [viewMode, setViewMode] = useState('weekly'); // 'weekly' | 'monthly'
@@ -289,22 +256,10 @@
             const [loginError, setLoginError] = useState(false);
 
             useEffect(() => {
-                if (!db) { setIsLoading(false); setLoadError('No se pudo inicializar Firebase. Revisa tu conexión, antivirus o firewall.'); return; }
-
-                const connectionTimeout = setTimeout(() => {
-                    setIsLoading(false);
-                    setLoadError('No se pudo conectar a la base de datos (tardó demasiado). Puede ser tu conexión, antivirus/firewall o un bloqueador de anuncios. Intenta con otra red o navegador.');
-                }, 12000);
-
-                const u1 = db.collection("incidents").onSnapshot(
-                    s => { clearTimeout(connectionTimeout); setLoadError(null); setIncidents(s.docs.map(d => ({ id: d.id, ...d.data() }))); setIsLoading(false); },
-                    error => { clearTimeout(connectionTimeout); console.error("Error cargando incidents:", error); setIsLoading(false); setLoadError('Error al conectar con la base de datos: ' + error.message); }
-                );
-                const u2 = db.collection("complaints").onSnapshot(
-                    s => { setComplaints(s.docs.map(d => ({ id: d.id, ...d.data() }))); },
-                    error => { console.error("Error cargando complaints:", error); }
-                );
-                return () => { u1(); u2(); clearTimeout(connectionTimeout); };
+                if (!db) return;
+                const u1 = db.collection("incidents").onSnapshot(s => { setIncidents(s.docs.map(d => ({ id: d.id, ...d.data() }))); setIsLoading(false); });
+                const u2 = db.collection("complaints").onSnapshot(s => { setComplaints(s.docs.map(d => ({ id: d.id, ...d.data() }))); });
+                return () => { u1(); u2(); };
             }, []);
 
             const showNotification = (type, message) => { setNotification({ type, message }); setTimeout(() => setNotification(null), 3000); };
@@ -527,15 +482,6 @@
                             </div>
                         </div>
                     </header>
-
-                    {loadError && (
-                        <div className="max-w-7xl mx-auto px-4 pt-4">
-                            <div className="bg-red-50 border border-red-300 text-red-700 text-sm rounded-lg px-4 py-3 flex items-start gap-2">
-                                <Icons.AlertTriangle />
-                                <div><b>Problema de conexión:</b> {loadError}</div>
-                            </div>
-                        </div>
-                    )}
                     
                     {notification && <div className={`fixed top-20 right-4 p-4 rounded shadow-lg z-50 text-white ${notification.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>{notification.message}</div>}
 
@@ -643,7 +589,7 @@
                             <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2"><span className="bg-slate-200 p-1 rounded"><Icons.BarChart2 /></span> Tendencias ({viewMode === 'monthly' ? 'Últimos 8 Meses' : 'Últimas 8 Semanas'})</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <TrendChart title="N. Serv. Global" data={dashboardData.trends} dataKey="globalServiceLevel" color="#4f46e5" suffix="%" goal={95} />
-                                <TrendChart title="Llegadas a Tiempo" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" weight="15%" goal={98} />
+                                <TrendChart title="Llegadas a Tiempo" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" weight="15%" goal={95} />
                                 <TrendChart title="Score Seguridad" data={dashboardData.trends} dataKey="safetyScore" color="#3b82f6" suffix="%" weight="15%" goal={90} />
                                 <TrendChart title="Apego a Croquis" data={dashboardData.trends} dataKey="routeQuality" color="#06b6d4" suffix="%" weight="10%" goal={95} />
                                 <TrendChart title="Inicios Tarde" data={dashboardData.trends} dataKey="lateStarts" color="#f59e0b" weight="10%" goalFn={d => 2 * (d.weeksInMonth || 1)} goalLabel="" />
